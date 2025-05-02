@@ -1,20 +1,9 @@
-// input_screen.dart con botón para mostrar sobrantes agrupados por grupo y kit y kits predefinidos
+// input_screen.dart actualizado para usar los kits de kit_selector_screen.dart
 
 import 'package:flutter/material.dart';
 import '../sobrantes.dart';
-
-final Map<String, List<Map<String, dynamic>>> kitsPredefinidos = {
-  'Kit A': [
-    {'tipo': '2"', 'largo': 25.0, 'cantidad': 2},
-    {'tipo': '2"', 'largo': 50.0, 'cantidad': 2},
-    {'tipo': '2"', 'largo': 55.0, 'cantidad': 2},
-    {'tipo': '2½"', 'largo': 64.0, 'cantidad': 2},
-    {'tipo': '2½"', 'largo': 50.0, 'cantidad': 2},
-    {'tipo': '2½"', 'largo': 86.0, 'cantidad': 2},
-    {'tipo': '2"', 'largo': 25.0, 'cantidad': 2},
-    {'tipo': '2½"', 'largo': 53.0, 'cantidad': 2},
-  ],
-};
+import '../models/kits.dart'; // ya está incluida, pero asegúrate de que el path sea correcto
+// Importamos los kits formales
 
 class InputScreen extends StatefulWidget {
   const InputScreen({super.key});
@@ -47,7 +36,7 @@ class _InputScreenState extends State<InputScreen> {
   }
 
   void cargarCortesDesdeKit(String nombreKit) {
-    final kit = kitsPredefinidos[nombreKit]!;
+    final kit = allKits[nombreKit]!;
 
     final cortesTel = <double>[];
     final cortes2 = <double>[];
@@ -66,7 +55,7 @@ class _InputScreenState extends State<InputScreen> {
       } else if (tipo == '2½"') {
         lista = cortes25;
       } else {
-        throw Exception('Tipo desconocido: \$tipo');
+        throw Exception('Tipo desconocido: $tipo');
       }
 
       for (int i = 0; i < cantidad; i++) {
@@ -110,7 +99,8 @@ class _InputScreenState extends State<InputScreen> {
             Padding(
               padding: const EdgeInsets.only(left: 12.0, bottom: 4.0),
               child: Text(
-                  '• ${etiquetaEntry.key}: ${etiquetaEntry.value.map((v) => '${v.toStringAsFixed(0)} mm').join(', ')}'),
+                '• ${etiquetaEntry.key}: ${etiquetaEntry.value.map((v) => '${v.toStringAsFixed(0)} mm').join(', ')}',
+              ),
             ),
           ],
           const SizedBox(height: 8),
@@ -140,7 +130,7 @@ class _InputScreenState extends State<InputScreen> {
                 setState(() => _kitSeleccionado = v);
                 if (v != null) cargarCortesDesdeKit(v);
               },
-              items: kitsPredefinidos.keys
+              items: allKits.keys
                   .map((String k) => DropdownMenuItem<String>(
                         value: k,
                         child: Text(k),
