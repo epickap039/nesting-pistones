@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "346065942707",
+    "project_id": "nestingpistones",
+    "storage_bucket": "nestingpistones.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:346065942707:android:27453f1b8adde8dbab18c6",
+        "android_client_info": {
+          "package_name": "com.JAES.nestingpistones"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPq5snKXpjHzP2kToPZI859-wmdOH7NHc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
