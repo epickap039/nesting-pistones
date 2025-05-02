@@ -1,6 +1,6 @@
-// result_screen.dart actualizado para pasar grupo lógico a optimizeCutsConSobrantes
 import 'package:flutter/material.dart';
 import '../bin_packing.dart';
+import '../sobrantes.dart';
 
 class ResultScreen extends StatelessWidget {
   const ResultScreen({super.key});
@@ -12,6 +12,10 @@ class ResultScreen extends StatelessWidget {
     final cortes2 = List<double>.from(args['cuts2']);
     final cortes25 = List<double>.from(args['cuts25']);
     final tubeLength = args['tubeLength'] as double;
+
+    // Inicia una nueva iteración en sobrantesRepo
+    final iter = DateTime.now().millisecondsSinceEpoch;
+    sobrantesRepo.iniciarIteracion(iter);
 
     Widget buildKit(
       String title,
@@ -45,8 +49,7 @@ class ResultScreen extends StatelessWidget {
         grupo,
       );
 
-      final allCuts = validCuts;
-      final uniqueCuts = allCuts.toSet().toList()..sort();
+      final uniqueCuts = validCuts.toSet().toList()..sort();
       final colorMap = {
         for (int i = 0; i < uniqueCuts.length; i++)
           uniqueCuts[i]: Colors.primaries[i % Colors.primaries.length],
@@ -69,15 +72,13 @@ class ResultScreen extends StatelessWidget {
               spacing: 6,
               runSpacing: 6,
               children: invalidCuts
-                  .map(
-                    (pulg) => Chip(
-                      label: Text(
-                        '$pulg″ — El corte no puede realizarse en este tubo',
-                      ),
-                      backgroundColor: Colors.red[100],
-                      labelStyle: const TextStyle(color: Colors.red),
-                    ),
-                  )
+                  .map((pulg) => Chip(
+                        label: Text(
+                          '$pulg″ — El corte no puede realizarse en este tubo',
+                        ),
+                        backgroundColor: Colors.red[100],
+                        labelStyle: const TextStyle(color: Colors.red),
+                      ))
                   .toList(),
             ),
             const SizedBox(height: 12),
@@ -120,8 +121,7 @@ class ResultScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Desperdicio: ${(tubeLength - used).toStringAsFixed(0)} mm',
-                  ),
+                      'Desperdicio: ${(tubeLength - used).toStringAsFixed(0)} mm'),
                 ],
               ),
             );

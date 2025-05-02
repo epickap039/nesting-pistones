@@ -1,4 +1,3 @@
-// bin_packing.dart con agrupación unificada por kit común
 import 'sobrantes.dart';
 
 class ResultadoBin {
@@ -15,7 +14,6 @@ String grupoUnificado(String etiqueta) {
   if (lower.contains('barra') && lower.contains('1 1/2')) {
     return 'Barra cromada 1 1/2"';
   }
-
   if (lower.contains('camisa de 3 1/2')) return 'Telescópico';
   if (lower.contains('tub')) return 'Telescópico';
   if (lower.contains('2½')) return '2½"';
@@ -29,21 +27,24 @@ List<ResultadoBin> optimizeCutsConSobrantes(
   String etiquetaKit,
   String grupo,
 ) {
-  final sorted =
-      cutsPulg.map((p) => (p * 25.4) - adjust).where((mm) => mm > 0).toList()
-        ..sort((a, b) => b.compareTo(a));
+  // convierte pulgadas a mm y ajusta, luego ordena descendentemente
+  final sorted = cutsPulg
+      .map((p) => (p * 25.4) - adjust)
+      .where((mm) => mm > 0)
+      .toList()
+    ..sort((a, b) => b.compareTo(a));
 
   final List<ResultadoBin> resultado = [];
   final List<double> used = [];
 
-  final grupoFinal = grupoUnificado(etiquetaKit);
+  // usar el grupo lógico unificado en lugar de la etiqueta para agrupar sobrantes
+  final grupoFinal = grupoUnificado(grupo);
 
   for (var cut in sorted) {
-    // No usar sobrantes por ahora
     bool placed = false;
     for (int i = 0; i < resultado.length; i++) {
       final bin = resultado[i];
-      if (!bin.desdeSobrante.contains(true) && used[i] + cut <= tubeLength) {
+      if (used[i] + cut <= tubeLength) {
         bin.cortes.add(cut);
         bin.desdeSobrante.add(false);
         used[i] += cut;
@@ -51,19 +52,16 @@ List<ResultadoBin> optimizeCutsConSobrantes(
         break;
       }
     }
-
     if (!placed) {
       resultado.add(ResultadoBin([cut], [false]));
       used.add(cut);
     }
   }
 
+  // agregar sobrantes solo si el remanente es significativo
   for (int i = 0; i < resultado.length; i++) {
-    final bin = resultado[i];
-    final isFromSobrante = bin.desdeSobrante.every((e) => e);
-    if (isFromSobrante) continue;
     final restante = tubeLength - used[i];
-    if (restante > 100) {
+    if (restante > 0) {
       sobrantesRepo.agregar(etiquetaKit, restante, grupoFinal);
     }
   }

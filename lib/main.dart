@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'screens/input_screen.dart';
-import 'screens/result_screen.dart';
+import 'screens/input_screen.dart' as input_scr;
+import 'screens/result_screen.dart' as result_scr;
 
 void main() {
   runApp(const MyApp());
@@ -16,8 +16,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.indigo),
       initialRoute: '/',
       routes: {
-        '/': (_) => const InputScreen(),
-        '/results': (_) => const ResultScreen(),
+        '/': (_) => const input_scr.InputScreen(),
+        '/results': (_) => const result_scr.ResultScreen(),
       },
     );
   }

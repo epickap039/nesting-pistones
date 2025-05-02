@@ -1,6 +1,20 @@
-// input_screen.dart con botón para mostrar sobrantes agrupados por grupo y kit
+// input_screen.dart con botón para mostrar sobrantes agrupados por grupo y kit y kits predefinidos
+
 import 'package:flutter/material.dart';
 import '../sobrantes.dart';
+
+final Map<String, List<Map<String, dynamic>>> kitsPredefinidos = {
+  'Kit A': [
+    {'tipo': '2"', 'largo': 25.0, 'cantidad': 2},
+    {'tipo': '2"', 'largo': 50.0, 'cantidad': 2},
+    {'tipo': '2"', 'largo': 55.0, 'cantidad': 2},
+    {'tipo': '2½"', 'largo': 64.0, 'cantidad': 2},
+    {'tipo': '2½"', 'largo': 50.0, 'cantidad': 2},
+    {'tipo': '2½"', 'largo': 86.0, 'cantidad': 2},
+    {'tipo': '2"', 'largo': 25.0, 'cantidad': 2},
+    {'tipo': '2½"', 'largo': 53.0, 'cantidad': 2},
+  ],
+};
 
 class InputScreen extends StatefulWidget {
   const InputScreen({super.key});
@@ -13,6 +27,7 @@ class _InputScreenState extends State<InputScreen> {
   double _tubeLength = 6000;
   final List<String> _tubeTypes = ['Telescópico', '2"', '2½"'];
   String _selectedType = 'Telescópico';
+  String? _kitSeleccionado;
   final Map<String, List<double>> _cutsByType = {
     'Telescópico': [],
     '2"': [],
@@ -21,14 +36,54 @@ class _InputScreenState extends State<InputScreen> {
 
   bool _showSobrantes = false;
 
-  final _cutController = TextEditingController();
-  final _qtyController = TextEditingController();
+  final TextEditingController _cutController = TextEditingController();
+  final TextEditingController _qtyController = TextEditingController();
 
   @override
   void dispose() {
     _cutController.dispose();
     _qtyController.dispose();
     super.dispose();
+  }
+
+  void cargarCortesDesdeKit(String nombreKit) {
+    final kit = kitsPredefinidos[nombreKit]!;
+
+    final cortesTel = <double>[];
+    final cortes2 = <double>[];
+    final cortes25 = <double>[];
+
+    for (var entrada in kit) {
+      final tipo = entrada['tipo'] as String;
+      final largo = entrada['largo'] as double;
+      final cantidad = entrada['cantidad'] as int;
+
+      List<double> lista;
+      if (tipo == 'Telescópico') {
+        lista = cortesTel;
+      } else if (tipo == '2"') {
+        lista = cortes2;
+      } else if (tipo == '2½"') {
+        lista = cortes25;
+      } else {
+        throw Exception('Tipo desconocido: \$tipo');
+      }
+
+      for (int i = 0; i < cantidad; i++) {
+        lista.add(largo);
+      }
+    }
+
+    Navigator.pushNamed(
+      context,
+      '/results',
+      arguments: {
+        'cutsTel': cortesTel,
+        'cuts2': cortes2,
+        'cuts25': cortes25,
+        'tubeLength': _tubeLength,
+      },
+    );
   }
 
   Widget buildSobrantesAgrupados() {
@@ -46,31 +101,20 @@ class _InputScreenState extends State<InputScreen> {
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
-        ...agrupados.entries.map((grupoEntry) {
-          final grupo = grupoEntry.key;
-          final etiquetas = grupoEntry.value;
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Grupo: $grupo',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              ...etiquetas.entries.map((etqEntry) {
-                final etiqueta = etqEntry.key;
-                final valores = etqEntry.value;
-                final lista = valores
-                    .map((v) => '${v.toStringAsFixed(0)} mm')
-                    .join(', ');
-                return Padding(
-                  padding: const EdgeInsets.only(left: 12.0, bottom: 4.0),
-                  child: Text('• $etiqueta: $lista'),
-                );
-              }),
-              const SizedBox(height: 8),
-            ],
-          );
-        }),
+        for (final grupoEntry in agrupados.entries) ...[
+          Text(
+            'Grupo: ${grupoEntry.key}',
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          for (final etiquetaEntry in grupoEntry.value.entries) ...[
+            Padding(
+              padding: const EdgeInsets.only(left: 12.0, bottom: 4.0),
+              child: Text(
+                  '• ${etiquetaEntry.key}: ${etiquetaEntry.value.map((v) => '${v.toStringAsFixed(0)} mm').join(', ')}'),
+            ),
+          ],
+          const SizedBox(height: 8),
+        ],
         const SizedBox(height: 12),
       ],
     );
@@ -85,29 +129,50 @@ class _InputScreenState extends State<InputScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            DropdownButtonFormField<String>(
+              decoration: const InputDecoration(
+                labelText: 'Kit predefinido',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.list_alt),
+              ),
+              value: _kitSeleccionado,
+              onChanged: (String? v) {
+                setState(() => _kitSeleccionado = v);
+                if (v != null) cargarCortesDesdeKit(v);
+              },
+              items: kitsPredefinidos.keys
+                  .map((String k) => DropdownMenuItem<String>(
+                        value: k,
+                        child: Text(k),
+                      ))
+                  .toList(),
+            ),
+            const SizedBox(height: 16),
             TextField(
-              controller: TextEditingController(text: _tubeLength.toString()),
               decoration: const InputDecoration(
                 labelText: 'Largo tubo (mm)',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.straighten),
               ),
+              controller: TextEditingController(text: _tubeLength.toString()),
               keyboardType: TextInputType.number,
-              onChanged: (v) => _tubeLength = double.tryParse(v) ?? _tubeLength,
+              onChanged: (String v) {
+                _tubeLength = double.tryParse(v) ?? _tubeLength;
+              },
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: _selectedType,
               decoration: const InputDecoration(
                 labelText: 'Tipo de tubo',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.category),
               ),
-              items:
-                  _tubeTypes
-                      .map((t) => DropdownMenuItem(value: t, child: Text(t)))
-                      .toList(),
-              onChanged: (v) => setState(() => _selectedType = v!),
+              value: _selectedType,
+              onChanged: (String? v) => setState(() => _selectedType = v!),
+              items: _tubeTypes
+                  .map(
+                      (t) => DropdownMenuItem<String>(value: t, child: Text(t)))
+                  .toList(),
             ),
             const SizedBox(height: 16),
             Row(
@@ -115,11 +180,11 @@ class _InputScreenState extends State<InputScreen> {
                 Expanded(
                   flex: 2,
                   child: TextField(
-                    controller: _cutController,
                     decoration: const InputDecoration(
                       labelText: 'Corte (" pulgadas)',
                       border: OutlineInputBorder(),
                     ),
+                    controller: _cutController,
                     keyboardType: TextInputType.number,
                   ),
                 ),
@@ -127,11 +192,11 @@ class _InputScreenState extends State<InputScreen> {
                 Expanded(
                   flex: 1,
                   child: TextField(
-                    controller: _qtyController,
                     decoration: const InputDecoration(
                       labelText: 'Cantidad',
                       border: OutlineInputBorder(),
                     ),
+                    controller: _qtyController,
                     keyboardType: TextInputType.number,
                   ),
                 ),
@@ -147,11 +212,12 @@ class _InputScreenState extends State<InputScreen> {
                     ),
                   ),
                   onPressed: () {
-                    final cut = double.tryParse(_cutController.text);
-                    final qty = int.tryParse(_qtyController.text);
+                    final double? cut = double.tryParse(_cutController.text);
+                    final int? qty = int.tryParse(_qtyController.text);
                     if (cut == null || qty == null) return;
                     setState(() {
-                      _cutsByType[_selectedType]!.addAll(List.filled(qty, cut));
+                      _cutsByType[_selectedType]!
+                          .addAll(List<double>.filled(qty, cut));
                     });
                     _cutController.clear();
                     _qtyController.clear();
@@ -163,15 +229,15 @@ class _InputScreenState extends State<InputScreen> {
             Expanded(
               child: ListView(
                 children: [
-                  ..._cutsByType.entries.map((e) {
-                    return Padding(
+                  for (final entry in _cutsByType.entries) ...[
+                    Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Text(
-                        '${e.key}: ${e.value.map((c) => c.toStringAsFixed(2)).join(", ")}',
+                        '${entry.key}: ${entry.value.map((c) => c.toStringAsFixed(2)).join(', ')}',
                         style: const TextStyle(fontSize: 16),
                       ),
-                    );
-                  }),
+                    ),
+                  ],
                   buildSobrantesAgrupados(),
                 ],
               ),
@@ -183,7 +249,7 @@ class _InputScreenState extends State<InputScreen> {
                   child: ElevatedButton(
                     child: const Text('Optimizar Todo'),
                     onPressed: () {
-                      setState(() => sobrantesRepo.vaciar());
+                      sobrantesRepo.vaciar();
                       Navigator.pushNamed(
                         context,
                         '/results',
@@ -222,7 +288,9 @@ class _InputScreenState extends State<InputScreen> {
                     child: const Text('Limpiar Todo'),
                     onPressed: () {
                       setState(() {
-                        _cutsByType.forEach((_, list) => list.clear());
+                        for (final key in _cutsByType.keys) {
+                          _cutsByType[key]!.clear();
+                        }
                         sobrantesRepo.vaciar();
                         _showSobrantes = false;
                       });
