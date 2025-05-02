@@ -1,9 +1,8 @@
-// input_screen.dart actualizado para usar los kits de kit_selector_screen.dart
+// input_screen.dart actualizado para usar los kits de kits.dart sin decimales en visualización de cortes
 
 import 'package:flutter/material.dart';
 import '../sobrantes.dart';
-import '../models/kits.dart'; // ya está incluida, pero asegúrate de que el path sea correcto
-// Importamos los kits formales
+import '../models/kits.dart';
 
 class InputScreen extends StatefulWidget {
   const InputScreen({super.key});
@@ -24,7 +23,6 @@ class _InputScreenState extends State<InputScreen> {
   };
 
   bool _showSobrantes = false;
-
   final TextEditingController _cutController = TextEditingController();
   final TextEditingController _qtyController = TextEditingController();
 
@@ -77,7 +75,6 @@ class _InputScreenState extends State<InputScreen> {
 
   Widget buildSobrantesAgrupados() {
     if (!_showSobrantes) return const SizedBox.shrink();
-
     final agrupados = sobrantesRepo.agrupadosPorGrupo();
     if (agrupados.isEmpty) return const Text('No hay sobrantes');
 
@@ -85,14 +82,10 @@ class _InputScreenState extends State<InputScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Divider(),
-        const Text(
-          'Sobrantes por grupo y kit',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
         const SizedBox(height: 8),
         for (final grupoEntry in agrupados.entries) ...[
           Text(
-            'Grupo: ${grupoEntry.key}',
+            'Sobrantes por tipo de Tubo: ${grupoEntry.key}',
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           for (final etiquetaEntry in grupoEntry.value.entries) ...[
@@ -113,7 +106,8 @@ class _InputScreenState extends State<InputScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Definir Kit'), centerTitle: true),
+      appBar:
+          AppBar(title: const Text('Nesting de Pistones'), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -171,7 +165,7 @@ class _InputScreenState extends State<InputScreen> {
                   flex: 2,
                   child: TextField(
                     decoration: const InputDecoration(
-                      labelText: 'Corte (" pulgadas)',
+                      labelText: 'Corte/Piston (" pulgadas)',
                       border: OutlineInputBorder(),
                     ),
                     controller: _cutController,
@@ -223,7 +217,7 @@ class _InputScreenState extends State<InputScreen> {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Text(
-                        '${entry.key}: ${entry.value.map((c) => c.toStringAsFixed(2)).join(', ')}',
+                        '${entry.key}: ${entry.value.map((c) => c.toStringAsFixed(0)).join(', ')}',
                         style: const TextStyle(fontSize: 16),
                       ),
                     ),
