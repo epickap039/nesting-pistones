@@ -68,18 +68,17 @@ class ResultScreen extends StatelessWidget {
             Wrap(
               spacing: 6,
               runSpacing: 6,
-              children:
-                  invalidCuts
-                      .map(
-                        (pulg) => Chip(
-                          label: Text(
-                            '$pulg″ — El corte no puede realizarse en este tubo',
-                          ),
-                          backgroundColor: Colors.red[100],
-                          labelStyle: const TextStyle(color: Colors.red),
-                        ),
-                      )
-                      .toList(),
+              children: invalidCuts
+                  .map(
+                    (pulg) => Chip(
+                      label: Text(
+                        '$pulg″ — El corte no puede realizarse en este tubo',
+                      ),
+                      backgroundColor: Colors.red[100],
+                      labelStyle: const TextStyle(color: Colors.red),
+                    ),
+                  )
+                  .toList(),
             ),
             const SizedBox(height: 12),
           ],
@@ -108,13 +107,12 @@ class ResultScreen extends StatelessWidget {
                           child: Chip(
                             label: Text(
                               desdeSobrante
-                                  ? '${pulg.toStringAsFixed(2)}″ ♻️'
-                                  : '${pulg.toStringAsFixed(2)}″',
+                                  ? '${pulg.toStringAsFixed(2)}″ | ${mm.toStringAsFixed(0)} mm ♻️'
+                                  : '${pulg.toStringAsFixed(2)}″ | ${mm.toStringAsFixed(0)} mm',
                             ),
-                            backgroundColor:
-                                desdeSobrante
-                                    ? Colors.grey[400]
-                                    : colorMap[pulg] ?? Colors.grey,
+                            backgroundColor: desdeSobrante
+                                ? Colors.grey[400]
+                                : colorMap[pulg] ?? Colors.grey,
                           ),
                         );
                       }),
