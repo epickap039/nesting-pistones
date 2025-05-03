@@ -9,6 +9,6 @@ void main() {
     // Carga la app
     await tester.pumpWidget(MyApp());
     // Verifica el título de la AppBar
-    expect(find.text('Definir Kit'), findsOneWidget);
+    expect(find.text('Nesting Pistones'), findsOneWidget);
   });
 }
