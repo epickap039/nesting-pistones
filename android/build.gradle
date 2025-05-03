@@ -1,0 +1,44 @@
+// Versión de Kotlin actualizada para compatibilidad con Firebase
+buildscript {
+ext.kotlin_version = '2.0.0'
+
+
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        // Plugin de Android
+        classpath 'com.android.tools.build:gradle:8.7.0'
+
+        // Plugin de Kotlin
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+
+        // Plugin de Google Services para Firebase
+        classpath 'com.google.gms:google-services:4.4.2'
+    }
+}
+
+// Repositorios compartidos por todos los módulos del proyecto
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+// Configuración del directorio de compilación (opcional, puedes omitir si no personalizas)
+ext {
+    newBuildDir = rootProject.file('../build')
+}
+
+subprojects {
+    buildDir = "${rootProject.ext.newBuildDir}/${project.name}"
+    evaluationDependsOn(':app')
+}
+
+// Tarea para limpiar los builds
+tasks.register("clean", Delete) {
+    delete rootProject.layout.buildDirectory
+}
