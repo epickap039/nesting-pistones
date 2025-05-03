@@ -42,7 +42,7 @@ class _InputScreenState extends State<InputScreen> {
 
     for (var entrada in kit) {
       final tipo = entrada['tipo'] as String;
-      final largo = entrada['largo'] as double;
+    final largo = (entrada['largo'] as num).toDouble(); // Convert to double
       final cantidad = entrada['cantidad'] as int;
 
       List<double> lista;
