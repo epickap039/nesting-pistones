@@ -9,19 +9,19 @@ final Map<String, List<Map<String, dynamic>>> allKits = {
     {'tipo': 'Telescópico', 'largo': 55, 'cantidad': 2},
     {'tipo': '2"', 'largo': 64, 'cantidad': 2},
     {'tipo': '2"', 'largo': 18, 'cantidad': 2},
-    {'tipo': '2½"', 'largo': 70, 'cantidad': 2},
+    {'tipo': '2½"', 'largo': 70, 'cantidad': 2}, //REVISADO
   ],
-  'PISTONES HR C3- ATR /DX (HR CASCADIA/INTERNATIONAL V1)': [
+  'HR C3- ATR /DX (HR CASCADIA/INTERNATIONAL V1)': [
     {'tipo': '2"', 'largo': 25, 'cantidad': 2},
     {'tipo': '2"', 'largo': 50, 'cantidad': 4},
     {'tipo': '2"', 'largo': 55, 'cantidad': 2},
     {'tipo': '2½"', 'largo': 64, 'cantidad': 2},
     {'tipo': '2½"', 'largo': 50, 'cantidad': 2},
     {'tipo': '2½"', 'largo': 86, 'cantidad': 2},
-    {'tipo': '2"', 'largo': 29, 'cantidad': 2},
-    {'tipo': '2½"', 'largo': 53, 'cantidad': 2},
+    {'tipo': '2"', 'largo': 25, 'cantidad': 2},
+    {'tipo': '2½"', 'largo': 53, 'cantidad': 2}, //ESTE YA ESTA CHIDO
   ],
-  'PISTONES HEAD RAM SCANIA': [
+  'HEAD RAM SCANIA': [
     {'tipo': '2"', 'largo': 27, 'cantidad': 2},
     {'tipo': '2"', 'largo': 42, 'cantidad': 2},
     {'tipo': '2"', 'largo': 14, 'cantidad': 2},
@@ -29,18 +29,18 @@ final Map<String, List<Map<String, dynamic>>> allKits = {
     {'tipo': '2"', 'largo': 60, 'cantidad': 2},
     {'tipo': '2½"', 'largo': 50, 'cantidad': 2},
     {'tipo': '2"', 'largo': 20, 'cantidad': 2},
-    {'tipo': '2"', 'largo': 57, 'cantidad': 2},
+    {'tipo': '2"', 'largo': 57, 'cantidad': 2}, //REVISADO
   ],
-  'PISTONES HEAD RAMP TLM (HR KENWORTH V1)': [
+  'HEAD RAMP TLM (HR KENWORTH V1)': [
     {'tipo': '2"', 'largo': 25, 'cantidad': 2},
     {'tipo': '2"', 'largo': 75, 'cantidad': 4},
     {'tipo': '2"', 'largo': 50, 'cantidad': 2},
     {'tipo': '2½"', 'largo': 75, 'cantidad': 4},
     {'tipo': '2½"', 'largo': 52, 'cantidad': 2},
     {'tipo': '2"', 'largo': 28, 'cantidad': 2},
-    {'tipo': '2"', 'largo': 53, 'cantidad': 2},
+    {'tipo': '2"', 'largo': 53, 'cantidad': 2}, //REVISADO
   ],
-  'FULL R1 2023 MODIFICADO (R1 FULL 2024-2025)': [
+  'FULL R1 2023 (R1 FULL 2024-2025)': [
     {'tipo': '2"', 'largo': 54, 'cantidad': 2},
     {'tipo': '2"', 'largo': 74, 'cantidad': 2},
     {'tipo': '2½"', 'largo': 72, 'cantidad': 2},
@@ -54,9 +54,9 @@ final Map<String, List<Map<String, dynamic>>> allKits = {
     {'tipo': 'Telescópico', 'largo': 46, 'cantidad': 4},
     {'tipo': 'Telescópico', 'largo': 52, 'cantidad': 2},
     {'tipo': '2½"', 'largo': 42, 'cantidad': 2},
-    {'tipo': '2½"', 'largo': 41, 'cantidad': 1},
+    {'tipo': '2½"', 'largo': 41, 'cantidad': 1}, //REVISADO
   ],
-  'LISTA DE PISTONES R2 (FULL R2 2024-2025)': [
+  'FULL R2 (FULL R2 2024-2025)': [
     {'tipo': '2"', 'largo': 77, 'cantidad': 6},
     {'tipo': '2½"', 'largo': 75, 'cantidad': 2},
     {'tipo': '2"', 'largo': 38, 'cantidad': 6},
@@ -65,9 +65,9 @@ final Map<String, List<Map<String, dynamic>>> allKits = {
     {'tipo': 'Telescópico', 'largo': 55, 'cantidad': 2},
     {'tipo': '2"', 'largo': 64, 'cantidad': 2},
     {'tipo': '2"', 'largo': 18, 'cantidad': 2},
-    {'tipo': '2½"', 'largo': 70, 'cantidad': 1},
+    {'tipo': '2½"', 'largo': 70, 'cantidad': 1}, //REVISADO
   ],
-  'PISTONES HEAD RAMP TRL/ NISSA (KENWORTH V2)': [
+  'HEAD RAMP TRL/ NISSAN (KENWORTH V2)': [
     {'tipo': '2"', 'largo': 25, 'cantidad': 2},
     {'tipo': '2"', 'largo': 75, 'cantidad': 4},
     {'tipo': '2"', 'largo': 50, 'cantidad': 2},
@@ -75,6 +75,6 @@ final Map<String, List<Map<String, dynamic>>> allKits = {
     {'tipo': '2½"', 'largo': 52, 'cantidad': 2},
     {'tipo': '2½"', 'largo': 75, 'cantidad': 2},
     {'tipo': '2"', 'largo': 28, 'cantidad': 2},
-    {'tipo': '2"', 'largo': 53, 'cantidad': 2},
+    {'tipo': '2"', 'largo': 53, 'cantidad': 2}, //REVISADO
   ],
 };
