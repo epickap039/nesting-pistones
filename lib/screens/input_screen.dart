@@ -1,5 +1,3 @@
-// input_screen.dart actualizado para usar los kits de kits.dart sin decimales en visualización de cortes
-
 import 'package:flutter/material.dart';
 import '../sobrantes.dart';
 import '../models/kits.dart';
@@ -13,16 +11,48 @@ class InputScreen extends StatefulWidget {
 
 class _InputScreenState extends State<InputScreen> {
   double _tubeLength = 6000;
-  final List<String> _tubeTypes = ['Telescópico', '2"', '2½"'];
-  String _selectedType = 'Telescópico';
   String? _kitSeleccionado;
-  final Map<String, List<double>> _cutsByType = {
-    'Telescópico': [],
-    '2"': [],
-    '2½"': [],
+
+  final List<String> _grupos = [
+    'Telescópico',
+    'Pistón Simple de 2"',
+    'Pistón Simple de 2 1/2"',
+  ];
+
+  final Map<String, List<String>> _subtiposPorGrupo = {
+    'Telescópico': [
+      'Camisa de 3 1/2" aluminio',
+      'Tubo Strock',
+      'Camisa de 2" aluminio',
+      'Barra cromada 1 1/2"'
+    ],
+    'Pistón Simple de 2"': ['Camisa de 2" aluminio', 'Barra cromada 1 1/2"'],
+    'Pistón Simple de 2 1/2"': [
+      'Camisa de 2 1/2" aluminio',
+      'Barra cromada 1 1/2"'
+    ],
   };
 
-  bool _showSobrantes = false;
+  String _grupoSeleccionado = 'Telescópico';
+  String _subtipoSeleccionado = 'Camisa de 3 1/2" aluminio';
+
+  final Map<String, Map<String, List<double>>> _cutsByType = {
+    'Telescópico': {
+      'Camisa de 3 1/2" aluminio': [],
+      'Tubo Strock': [],
+      'Camisa de 2" aluminio': [],
+      'Barra cromada 1 1/2"': [],
+    },
+    'Pistón Simple de 2"': {
+      'Camisa de 2" aluminio': [],
+      'Barra cromada 1 1/2"': [],
+    },
+    'Pistón Simple de 2 1/2"': {
+      'Camisa de 2 1/2" aluminio': [],
+      'Barra cromada 1 1/2"': [],
+    },
+  };
+
   final TextEditingController _cutController = TextEditingController();
   final TextEditingController _qtyController = TextEditingController();
 
@@ -33,73 +63,73 @@ class _InputScreenState extends State<InputScreen> {
     super.dispose();
   }
 
+  // Carga un kit predefinido y navega a resultados sin mezclar con manuales
   void cargarCortesDesdeKit(String nombreKit) {
-    final kit = allKits[nombreKit]!;
+    final kitBase = kits.firstWhere((k) => k['id'] == nombreKit);
+    final Map<String, Map<String, List<double>>> cortesConvertidos = {};
+    final rawCuts = kitBase['cuts'] as Map<String, dynamic>;
 
-    final cortesTel = <double>[];
-    final cortes2 = <double>[];
-    final cortes25 = <double>[];
+    rawCuts.forEach((grupo, subtipos) {
+      cortesConvertidos[grupo] = {};
+      (subtipos as Map<String, dynamic>).forEach((subtipo, lista) {
+        cortesConvertidos[grupo]![subtipo] = List<double>.from(lista);
+      });
+    });
 
-    for (var entrada in kit) {
-      final tipo = entrada['tipo'] as String;
-    final largo = (entrada['largo'] as num).toDouble(); // Convert to double
-      final cantidad = entrada['cantidad'] as int;
+    final ajustes = <String, double>{};
+    (kitBase['ajustes'] as Map<String, dynamic>)
+        .forEach((k, v) => ajustes[k] = (v as num).toDouble());
 
-      List<double> lista;
-      if (tipo == 'Telescópico') {
-        lista = cortesTel;
-      } else if (tipo == '2"') {
-        lista = cortes2;
-      } else if (tipo == '2½"') {
-        lista = cortes25;
-      } else {
-        throw Exception('Tipo desconocido: $tipo');
-      }
+    final kit = {
+      'id': nombreKit,
+      'cuts': cortesConvertidos,
+      'ajustes': ajustes
+    };
 
-      for (int i = 0; i < cantidad; i++) {
-        lista.add(largo);
-      }
-    }
-
-    Navigator.pushNamed(
-      context,
-      '/results',
-      arguments: {
-        'cutsTel': cortesTel,
-        'cuts2': cortes2,
-        'cuts25': cortes25,
-        'tubeLength': _tubeLength,
-      },
-    );
+    sobrantesRepo.vaciar();
+    Navigator.pushNamed(context, '/results', arguments: {
+      'tubeLength': _tubeLength,
+      'kits': [kit],
+    });
   }
 
-  Widget buildSobrantesAgrupados() {
-    if (!_showSobrantes) return const SizedBox.shrink();
-    final agrupados = sobrantesRepo.agrupadosPorGrupo();
-    if (agrupados.isEmpty) return const Text('No hay sobrantes');
+  // Optimiza cortes manuales actuales
+  void optimizarCortesManuales() {
+    final cortes = _cutsByType.map((grupo, subtipos) => MapEntry(grupo,
+        subtipos.map((sub, lista) => MapEntry(sub, List<double>.from(lista)))));
 
+    final kitManual = {
+      'id': 'Cortes Manuales',
+      'cuts': cortes,
+      'ajustes': ajustesPorSubtipo,
+    };
+
+    sobrantesRepo.vaciar();
+    Navigator.pushNamed(context, '/results', arguments: {
+      'tubeLength': _tubeLength,
+      'kits': [kitManual],
+    });
+  }
+
+  Widget buildListaCortes() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Divider(),
-        const SizedBox(height: 8),
-        for (final grupoEntry in agrupados.entries) ...[
-          Text(
-            'Sobrantes por tipo de Tubo: ${grupoEntry.key}',
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          for (final etiquetaEntry in grupoEntry.value.entries) ...[
-            Padding(
-              padding: const EdgeInsets.only(left: 12.0, bottom: 4.0),
-              child: Text(
-                '• ${etiquetaEntry.key}: ${etiquetaEntry.value.map((v) => '${v.toStringAsFixed(0)} mm').join(', ')}',
-              ),
+      children: _cutsByType.entries.expand((grupoEntry) {
+        final grupo = grupoEntry.key;
+        return grupoEntry.value.entries.map((subEntry) {
+          final subtipo = subEntry.key;
+          final lista = subEntry.value;
+          if (lista.isEmpty) return const SizedBox.shrink();
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Text(
+              '$grupo → $subtipo: '
+              '${lista.map((c) => c.toStringAsFixed(0)).join(', ')}',
+              style: const TextStyle(fontSize: 16),
             ),
-          ],
-          const SizedBox(height: 8),
-        ],
-        const SizedBox(height: 12),
-      ],
+          );
+        });
+      }).toList(),
     );
   }
 
@@ -120,175 +150,141 @@ class _InputScreenState extends State<InputScreen> {
                 prefixIcon: Icon(Icons.list_alt),
               ),
               value: _kitSeleccionado,
-              onChanged: (String? v) {
-                setState(() => _kitSeleccionado = v);
-                if (v != null) cargarCortesDesdeKit(v);
-              },
-              items: allKits.keys
-                  .map((String k) => DropdownMenuItem<String>(
-                        value: k,
-                        child: Text(k),
-                      ))
+              onChanged: (v) => cargarCortesDesdeKit(v!),
+              items: kits
+                  .map((k) => k['id'] as String)
+                  .map((id) => DropdownMenuItem(value: id, child: Text(id)))
                   .toList(),
             ),
             const SizedBox(height: 16),
             TextField(
               decoration: const InputDecoration(
-                labelText: 'Largo tubo (mm)',
+                labelText: 'Largo del tubo (mm)',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.straighten),
               ),
               controller: TextEditingController(text: _tubeLength.toString()),
               keyboardType: TextInputType.number,
-              onChanged: (String v) {
-                _tubeLength = double.tryParse(v) ?? _tubeLength;
-              },
+              onChanged: (v) => _tubeLength = double.tryParse(v) ?? _tubeLength,
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               decoration: const InputDecoration(
-                labelText: 'Tipo de tubo',
+                labelText: 'Grupo de tubo',
                 border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.category),
               ),
-              value: _selectedType,
-              onChanged: (String? v) => setState(() => _selectedType = v!),
-              items: _tubeTypes
-                  .map(
-                      (t) => DropdownMenuItem<String>(value: t, child: Text(t)))
+              value: _grupoSeleccionado,
+              onChanged: (v) {
+                setState(() {
+                  _grupoSeleccionado = v!;
+                  _subtipoSeleccionado = _subtiposPorGrupo[v]!.first;
+                });
+              },
+              items: _grupos
+                  .map((g) => DropdownMenuItem(value: g, child: Text(g)))
                   .toList(),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
+            DropdownButtonFormField<String>(
+              decoration: const InputDecoration(
+                labelText: 'Subtipo de tubo',
+                border: OutlineInputBorder(),
+              ),
+              value: _subtipoSeleccionado,
+              onChanged: (v) => setState(() => _subtipoSeleccionado = v!),
+              items: _subtiposPorGrupo[_grupoSeleccionado]!
+                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                  .toList(),
+            ),
+            const SizedBox(height: 8),
             Row(
               children: [
                 Expanded(
-                  flex: 2,
                   child: TextField(
-                    decoration: const InputDecoration(
-                      labelText: 'Corte/Piston (" pulgadas)',
-                      border: OutlineInputBorder(),
-                    ),
                     controller: _cutController,
                     keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Corte (" pulgadas)',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  flex: 1,
                   child: TextField(
+                    controller: _qtyController,
+                    keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
                       labelText: 'Cantidad',
                       border: OutlineInputBorder(),
                     ),
-                    controller: _qtyController,
-                    keyboardType: TextInputType.number,
                   ),
                 ),
                 const SizedBox(width: 8),
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.add),
-                  label: const Text('Agregar'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 14,
-                      horizontal: 24,
-                    ),
-                  ),
+                ElevatedButton(
                   onPressed: () {
-                    final double? cut = double.tryParse(_cutController.text);
-                    final int? qty = int.tryParse(_qtyController.text);
+                    final cut = double.tryParse(_cutController.text);
+                    final qty = int.tryParse(_qtyController.text);
                     if (cut == null || qty == null) return;
                     setState(() {
-                      _cutsByType[_selectedType]!
-                          .addAll(List<double>.filled(qty, cut));
+                      _cutsByType[_grupoSeleccionado]?[_subtipoSeleccionado]
+                          ?.addAll(List<double>.filled(qty, cut));
                     });
                     _cutController.clear();
                     _qtyController.clear();
                   },
+                  style:
+                      ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                  child: const Icon(Icons.add),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            Expanded(
-              child: ListView(
-                children: [
-                  for (final entry in _cutsByType.entries) ...[
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Text(
-                        '${entry.key}: ${entry.value.map((c) => c.toStringAsFixed(0)).join(', ')}',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ],
-                  buildSobrantesAgrupados(),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
+            Expanded(child: ListView(children: [buildListaCortes()])),
             Row(
               children: [
                 Expanded(
                   child: ElevatedButton(
+                    onPressed: optimizarCortesManuales,
                     child: const Text('Optimizar Todo'),
-                    onPressed: () {
-                      sobrantesRepo.vaciar();
-                      Navigator.pushNamed(
-                        context,
-                        '/results',
-                        arguments: {
-                          'cutsTel': _cutsByType['Telescópico']!,
-                          'cuts2': _cutsByType['2"']!,
-                          'cuts25': _cutsByType['2½"']!,
-                          'tubeLength': _tubeLength,
-                        },
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.undo),
-                    label: const Text('Deshacer'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orangeAccent,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        final list = _cutsByType[_selectedType]!;
-                        if (list.isNotEmpty) list.removeLast();
-                      });
-                    },
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
-                    ),
-                    child: const Text('Limpiar Todo'),
                     onPressed: () {
                       setState(() {
-                        for (final key in _cutsByType.keys) {
-                          _cutsByType[key]!.clear();
+                        final lista = _cutsByType[_grupoSeleccionado]
+                            ?[_subtipoSeleccionado];
+                        if (lista != null && lista.isNotEmpty) {
+                          lista.removeLast();
                         }
-                        sobrantesRepo.vaciar();
-                        _showSobrantes = false;
                       });
                     },
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange),
+                    child: const Text('Deshacer'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        for (var grupo in _cutsByType.values) {
+                          for (var lista in grupo.values) {
+                            lista.clear();
+                          }
+                        }
+                        sobrantesRepo.vaciar();
+                      });
+                    },
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    child: const Text('Limpiar Todo'),
                   ),
                 ),
               ],
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: () => setState(() => _showSobrantes = !_showSobrantes),
-              child: Text(
-                _showSobrantes ? 'Ocultar sobrantes' : 'Mostrar sobrantes',
-              ),
             ),
           ],
         ),
