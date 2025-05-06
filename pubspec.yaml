@@ -8,6 +8,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  table_calendar: ^3.0.8     # calendario
+  provider: ^6.0.5           # gestión de estado ligera
+  hive: ^2.2.3               # almacenamiento local
+  hive_flutter: ^1.1.0   
   firebase_core: ^2.30.0  
   cupertino_icons: ^1.0.2
 
