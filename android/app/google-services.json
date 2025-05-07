@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "412461953239",
+    "project_id": "nestingpistones-df878",
+    "storage_bucket": "nestingpistones-df878.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:412461953239:android:3021668b2b3987d9040092",
+        "android_client_info": {
+          "package_name": "com.example.nesting_pistones"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "412461953239-f3uejr8cuu7k1skik5s8c9rt7j2oh7a7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRxODQgHnF1qDEBSESkqvkpnFdLZr0Rrk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "412461953239-f3uejr8cuu7k1skik5s8c9rt7j2oh7a7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:412461953239:android:da09fbdc643fbe9d040092",
+        "android_client_info": {
+          "package_name": "com.jaes.nestingpistones"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "412461953239-f3uejr8cuu7k1skik5s8c9rt7j2oh7a7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRxODQgHnF1qDEBSESkqvkpnFdLZr0Rrk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "412461953239-f3uejr8cuu7k1skik5s8c9rt7j2oh7a7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
